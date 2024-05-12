@@ -1,4 +1,7 @@
 # BBC-Bouncer
+
+WORK IN PROGRESS! DONT USE THIS WITH YOUR MAIN WALLET! ONLY WORKS WITH ONE TOKEN ID RIGHT NOW 
+
 Welcome to BBC-Bouncer! This application automatically monitors a wallet for specific token IDs and bounces (sends to burn address) any tokens found. Checks for the blacklisted token IDs happen every 5 minutes.
 ## Setup
 1. Clone the repository and enter the directory:
