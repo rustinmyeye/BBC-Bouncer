@@ -21,7 +21,7 @@ docker build -t bouncer .
 3. Then to start the container:
 
 ```
-docker run -p 5000:5000 -d --name BBC-Bouncer BBC-Bouncer
+docker run -p 5000:5000 -d --name BBC-Bouncer bouncer
 ```
 4. Navigate to the web ui at `http://localhost:5000`
 5. Enter your mnemonic in the provided field below and click "Set Mnemonic".
