@@ -15,7 +15,7 @@ cd BBC-Bouncer
    
 
 ```
-docker build -t BBC-Bouncer .
+docker build -t bouncer .
 ``` 
 
 3. Then to start the container:
