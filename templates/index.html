@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBC-Bouncer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1c1c1c;
+            color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #242424;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .input-field {
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: #0d47a1;
+            color: #f2f2f2;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #003366;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BBC-Bouncer</h1>
+        <p>Welcome to BBC-Bouncer! This application automatically monitors a wallet for specific token IDs and bounces (sends to burn address) any tokens found. Checks for the blacklisted token IDs happen every 5 minutes.</p>
+        <h2>How to use:</h2>
+        <ol>
+            <li>Enter your mnemonic in the provided field below and click "Set Mnemonic".</li>
+            <li>Enter the Token ID's you want to bounce (separated by commas) in the field below and click "Set Token IDs".</li>
+            <li>To reset the mnemonic, click "Reset Mnemonic".</li>
+        </ol>
+        <form action="/set_mnemonic" method="post">
+            <div class="input-field">
+                <label for="mnemonic">Enter your mnemonic:</label><br>
+                <input type="text" id="mnemonic" name="mnemonic" required autocomplete="off"><br>
+            </div>
+            <button type="submit" class="button">Set Mnemonic</button>
+        </form>
+        <br> <!-- Added space -->
+        <form action="/set_token_ids" method="post">
+            <div class="input-field">
+                <label for="token_ids">Enter Token ID's to Bounce (separated by commas):</label><br>
+                <input type="text" id="token_ids" name="token_ids" required><br>
+            </div>
+            <button type="submit" class="button">Set Token IDs</button>
+        </form>
+        <form action="/reset_mnemonic" method="post">
+            <button type="submit" class="button">Reset Mnemonic</button>
+        </form>
+    </div>
+    <script>
+        // Clear mnemonic field after setting it
+        const mnemonicInput = document.getElementById('mnemonic');
+        if (mnemonicInput) {
+            mnemonicInput.value = '';
+        }
+    </script>
+</body>
+</html>
