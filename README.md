@@ -31,4 +31,4 @@ docker run -p 5000:5000 -d --name token-bouncer bouncer
 6. Enter the Token ID's you want to bounce (separated by commas) in the field below and click "Set Token IDs".
 7. If you wish to use an address other than the default bounce address, set it in the "New Bounce Address" field.
 
-![webui](https://github.com/rustinmyeye/BBC-Bouncer/blob/main/Screenshot%202024-05-12%20at%2020-45-01%20Token%20Bouncer.png?raw=true)
+![webui](https://github.com/rustinmyeye/token-bouncer/blob/main/Screenshot%202024-05-12%20at%2023-16-03%20Token%20Bouncer.png?raw=true)
