@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBC-Bouncer</title>
+    <title>Token Bouncer</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,7 +24,7 @@
             margin-bottom: 20px;
         }
         .button {
-            background-color: #0d47a1;
+            background-color: #787a5d;
             color: #f2f2f2;
             border: none;
             padding: 10px 20px;
@@ -32,19 +32,42 @@
             cursor: pointer;
         }
         .button:hover {
-            background-color: #003366;
+            background-color: #5f5d7a;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #5f5d7a;
+            color: #fff;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .alert-success {
+            background-color: #4CAF50;
+            color: white;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>BBC-Bouncer</h1>
-        <p>Welcome to BBC-Bouncer! This application automatically monitors a wallet for specific token IDs and bounces (sends to burn address) any tokens found. Checks for the blacklisted token IDs happen every 5 minutes.</p>
+        <h1>Token Bouncer</h1>
+        <p>Welcome to the Token Bouncer! This application automatically monitors a wallet for specific token IDs and bounces (sends to another address) any blacklisted tokens found. Checks for the blacklisted token IDs happen every 5 minutes.</p>
         <h2>How to use:</h2>
         <ol>
             <li>Enter your mnemonic in the provided field below and click "Set Mnemonic".</li>
             <li>Enter the Token ID's you want to bounce (separated by commas) in the field below and click "Set Token IDs".</li>
-            <li>To reset the mnemonic, click "Reset Mnemonic".</li>
+            <li>If you'd like to specify the address the tokens get sent to, change it in the "Enter New Bounce Address" feild.</li>
         </ol>
         <form action="/set_mnemonic" method="post">
             <div class="input-field">
@@ -53,7 +76,7 @@
             </div>
             <button type="submit" class="button">Set Mnemonic</button>
         </form>
-        <br> <!-- Added space -->
+        <br>
         <form action="/set_token_ids" method="post">
             <div class="input-field">
                 <label for="token_ids">Enter Token ID's to Bounce (separated by commas):</label><br>
@@ -61,16 +84,54 @@
             </div>
             <button type="submit" class="button">Set Token IDs</button>
         </form>
+        <br>
+        <form action="/set_bounce_address" method="post">
+            <div class="input-field">
+                <label for="bounce_address">Enter New Bounce Address:</label><br>
+                <input type="text" id="new_bounce_address" name="new_bounce_address"><br>
+            </div>
+            <button type="submit" class="button">Set Bounce Address</button>
+        </form>
+        <!-- br>
         <form action="/reset_mnemonic" method="post">
             <button type="submit" class="button">Reset Mnemonic</button>
-        </form>
+        </form -->
+
+        <!-- Display Success Message -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Display Token IDs in Table -->
+        {% if token_ids %}
+            <h2>Blacklisted Token IDs</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Token ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for token_id in token_ids %}
+                        <tr>
+                            <td>{{ token_id }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <!-- Display Bounce Address -->
+        {% if bounce_address %}
+            <h2>Bounce Address</h2>
+            <p>{{ bounce_address }}</p>
+        {% endif %}
     </div>
-    <script>
-        // Clear mnemonic field after setting it
-        const mnemonicInput = document.getElementById('mnemonic');
-        if (mnemonicInput) {
-            mnemonicInput.value = '';
-        }
-    </script>
 </body>
 </html>
