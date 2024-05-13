@@ -7,11 +7,11 @@ Welcome to the Token Bouncer! This application automatically monitors a wallet f
 1. Clone the repository and enter the directory:
 
 ```
-git clone https://github.com/rustinmyeye/BBC-Bouncer
+git clone https://github.com/rustinmyeye/Token-Bouncer
 ```
 
 ```
-cd BBC-Bouncer
+cd Token-Bouncer
 ```
    
 2. Ensure Docker is installed on your system then, build the image with:
