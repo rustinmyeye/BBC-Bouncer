@@ -1,6 +1,6 @@
 # Token-Bouncer
 
-WORK IN PROGRESS! DONT USE THIS WITH YOUR MAIN WALLET! IM AN IDIOT OK?!?!
+Use at your own risk. Bounced tokens get burnt if you use the default address.
 
 Welcome to the Token Bouncer! This application automatically monitors a wallet for blacklisted token IDs and bounces them (sends to another address). Checks for the blacklisted token IDs happen every 5 minutes. It will keep unwanted tokens out of your wallet!
 ## Setup
