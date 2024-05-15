@@ -13,7 +13,7 @@ TOKEN_IDS_FILE = 'token_ids.txt'
 WALLET_INITIALIZED_FILE = 'wallet_initialized.txt'
 
 # Default bounce address
-DEFAULT_BOUNCE_ADDRESS = '9gCBhSmzxSUe1KitTVnK1L4ibvkQ7V1pC1XjSokcjVHycyfsBwN'
+DEFAULT_BOUNCE_ADDRESS = '4MQyMKvMbnCJG3aJ'
 
 # Function to run subprocess and return output
 def run_subprocess(command):
