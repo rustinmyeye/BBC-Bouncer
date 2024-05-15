@@ -28,7 +28,7 @@ docker run -p 5000:5000 -d --name token-bouncer bouncer
 ```
 4. Navigate to the web ui at `http://localhost:5000`
 5. Enter your mnemonic in the provided field below and click "Set Mnemonic".
-6. Enter the Token ID's you want to bounce (separated by commas) in the field below and click "Set Token IDs".
+6. Enter the Token ID's you want to bounce (separated by commas like this - token, token, token) in the field below and click "Set Token IDs".
 7. If you wish to use an address other than the default bounce address, set it in the "New Bounce Address" field.
 8. The app will begin monitoring the address when the mnemonic is set.
 
