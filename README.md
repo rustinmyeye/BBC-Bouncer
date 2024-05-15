@@ -3,6 +3,8 @@
 Use at your own risk. Bounced tokens get burnt if you use the default address.
 
 Welcome to the Token Bouncer! This application automatically monitors a wallet for blacklisted token IDs and bounces them (sends to another address). Checks for the blacklisted token IDs happen every 5 minutes. It will keep unwanted tokens out of your wallet!
+
+Token Bouncer uses ThierryM1212's fantastic [Ergo Wallet CLI](https://github.com/ThierryM1212/ewc) to interact with the Ergo Blockchain.
 ## Setup
 1. Clone the repository and enter the directory:
 
