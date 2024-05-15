@@ -11,6 +11,7 @@ app.secret_key = 'your_secret_key'
 MNEMONIC_FILE = 'mnemonic.txt'
 TOKEN_IDS_FILE = 'token_ids.txt'
 WALLET_INITIALIZED_FILE = 'wallet_initialized.txt'
+BOUNCE_ADDRESS_FILE = 'bounce_address.txt'  # File to save bounce address
 
 # Default bounce address
 DEFAULT_BOUNCE_ADDRESS = '4MQyMKvMbnCJG3aJ'
@@ -35,12 +36,18 @@ def save_token_ids(token_ids):
     with open(TOKEN_IDS_FILE, 'w') as file:
         file.write('\n'.join(token_ids))
         
-# Function to save bounce address
+# Function to save bounce address to file
 def save_bounce_address(bounce_address):
-    # Save the bounce address to file or database, you can modify this based on your storage mechanism
-    # For simplicity, I'll just store it in a global variable
-    global DEFAULT_BOUNCE_ADDRESS
-    DEFAULT_BOUNCE_ADDRESS = bounce_address
+    with open(BOUNCE_ADDRESS_FILE, 'w') as file:
+        file.write(bounce_address)
+
+# Function to read bounce address from file
+def get_saved_bounce_address():
+    try:
+        with open(BOUNCE_ADDRESS_FILE, 'r') as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        return DEFAULT_BOUNCE_ADDRESS  # Return default if file doesn't exist
 
 # Function to check if wallet is initialized
 def is_wallet_initialized():
@@ -98,7 +105,7 @@ def check_and_bounce_tokens():
         wallet_data = json.loads(output)
         tokens = wallet_data.get('tokens', [])
 
-        bounce_address = request.form.get('bounce_address', DEFAULT_BOUNCE_ADDRESS)
+        bounce_address = get_saved_bounce_address()  # Get the saved bounce address
 
         for token_id in token_ids:
             for token in tokens:
@@ -110,13 +117,6 @@ def check_and_bounce_tokens():
                     print("Token bounced:", token['tokenId'])
                     break  # Stop searching for this token ID once it's found
 
-# Route to set mnemonic
-@app.route('/set_mnemonic', methods=['POST'])
-def set_mnemonic():
-    mnemonic = request.form['mnemonic']
-    save_mnemonic(mnemonic)
-    return redirect(url_for('home'))
-    
 # Route to set new bounce address
 @app.route('/set_bounce_address', methods=['POST'])
 def set_bounce_address():
@@ -133,7 +133,7 @@ def set_bounce_address():
 def home():
     mnemonic = get_mnemonic()
     token_ids = get_token_ids()
-    bounce_address = request.form.get('bounce_address', DEFAULT_BOUNCE_ADDRESS)
+    bounce_address = get_saved_bounce_address()  # Get the saved bounce address
     return render_template('index.html', mnemonic=mnemonic, token_ids=token_ids, bounce_address=bounce_address)
 
 # Route to set token IDs
