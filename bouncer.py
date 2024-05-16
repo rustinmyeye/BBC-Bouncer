@@ -128,6 +128,13 @@ def set_bounce_address():
     # Redirect to home page
     return redirect(url_for('home'))
 
+# Route to set mnemonic
+@app.route('/set_mnemonic', methods=['POST'])
+def set_mnemonic():
+    mnemonic = request.form['mnemonic']
+    save_mnemonic(mnemonic)
+    return redirect(url_for('home'))
+
 # Route for home page
 @app.route('/')
 def home():
