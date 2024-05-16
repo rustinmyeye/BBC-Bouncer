@@ -150,7 +150,7 @@ def set_token_ids():
     save_token_ids(token_ids)
     return redirect(url_for('home'))
 
-# Route to reset mnemonic
+# Route to reset mnemonic (not used right now)
 @app.route('/reset_mnemonic', methods=['POST'])
 def reset_mnemonic():
     subprocess.run(['rm', 'ewc/build/wallets/test.wallet'])
