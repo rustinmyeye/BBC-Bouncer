@@ -27,8 +27,8 @@ def save_mnemonic(mnemonic):
     with open(MNEMONIC_FILE, 'w') as file:
         file.write(mnemonic)
     initialize_wallet(mnemonic)
-    check_and_bounce_tokens()
-    start_token_checking_loop()
+    #check_and_bounce_tokens()
+    #start_token_checking_loop()
     flash("Wallet mnemonic set successfully", "success")
     
 # Function to save token IDs to file and start the loop for checking and sending tokens
@@ -85,6 +85,12 @@ def start_token_checking_loop():
     while True:
         check_and_bounce_tokens()
         time.sleep(5 * 60)  # 5 minutes
+        
+# Function to start the loop for checking and sending tokens
+def start_token_checking_loop_all():
+    while True:
+        check_and_bounce_all_tokens()
+        time.sleep(5 * 60)  # 5 minutes        
 
 # Function to check wallet for tokens and bounce if found
 def check_and_bounce_tokens():
@@ -116,8 +122,60 @@ def check_and_bounce_tokens():
                     process.communicate(input=b'y\n')  # Send "y" to confirm the transaction
                     print("Token bounced:", token['tokenId'])
                     break  # Stop searching for this token ID once it's found
+                    
+# Function to check wallet for all tokens and bounce if found
+def check_and_bounce_all_tokens():
+    if is_wallet_initialized():
+        mnemonic = get_mnemonic()
 
-# Route to set new bounce address
+        if not mnemonic:
+            return
+
+        command = ['ewc', 'wallet-get', '-b', 'all', 'test', '1234']
+        output, error = run_subprocess(command)
+
+        if error:
+            print("Error:", error)
+            return
+
+        wallet_data = json.loads(output)
+        tokens = wallet_data.get('tokens', [])
+
+        bounce_address = get_saved_bounce_address()  # Get the saved bounce address
+
+        for token in tokens:
+            token_id = token['tokenId']
+            # Bounce token
+            token_amount = token['amount'].replace(',', '')  # Remove comma
+            process = subprocess.Popen(['ewc', 'wallet-send', '-e', '0.0001', '-t', token_id, '-u', token_amount, '-a', bounce_address, 'test', '1234', '--sign', '--send'], stdin=subprocess.PIPE)
+            process.communicate(input=b'y\n')  # Send "y" to confirm the transaction
+            print("Token bounced:", token_id)
+                   
+# Route to start bouncing tokens
+@app.route('/start_bouncing', methods=['POST'])
+def start_bouncing():
+    mnemonic = get_mnemonic()
+    if mnemonic:
+        flash("Bouncing tokens initiated", "success")
+        start_token_checking_loop()  # Start the bouncing loop
+    else:
+        flash("Please set the wallet mnemonic first", "error")
+    return redirect(url_for('home'))
+    
+
+# Route to start bouncing all tokens
+@app.route('/start_bouncing_all', methods=['POST'])
+def start_bouncing_all():
+    mnemonic = get_mnemonic()
+    if mnemonic:
+        flash("Bouncing tokens initiated", "success")
+        start_token_checking_loop_all()
+        #start_token_checking_loop()  # Start the bouncing loop
+    else:
+        flash("Please set the wallet mnemonic first", "error")
+    return redirect(url_for('home'))
+    
+    # Route to set new bounce address
 @app.route('/set_bounce_address', methods=['POST'])
 def set_bounce_address():
     new_bounce_address = request.form['new_bounce_address']
@@ -125,7 +183,7 @@ def set_bounce_address():
     save_bounce_address(new_bounce_address)
     # Flash success message
     flash("Bounce address updated successfully", "success")
-    # Redirect to home page
+    # Redirect to home page`
     return redirect(url_for('home'))
 
 # Route to set mnemonic
@@ -143,11 +201,31 @@ def home():
     bounce_address = get_saved_bounce_address()  # Get the saved bounce address
     return render_template('index.html', mnemonic=mnemonic, token_ids=token_ids, bounce_address=bounce_address)
 
-# Route to set token IDs
-@app.route('/set_token_ids', methods=['POST'])
-def set_token_ids():
-    token_ids = request.form['token_ids'].split(',')
-    save_token_ids(token_ids)
+@app.route('/add_token_id', methods=['POST'])
+def add_token_id():
+    token_id = request.json.get('token_id', '')
+    if token_id:
+        token_ids = get_token_ids()
+        token_ids.append(token_id)
+        save_token_ids(token_ids)
+        flash(f'Token ID "{token_id}" added successfully.', 'success')
+    else:
+        flash('Failed to add token ID. Please provide a valid token ID.', 'error')
+    return redirect(url_for('home'))
+    
+@app.route('/remove_token_id', methods=['POST'])
+def remove_token_id():
+    token_id = request.json.get('token_id', '')
+    if token_id:
+        token_ids = get_token_ids()
+        if token_id in token_ids:
+            token_ids.remove(token_id)
+            save_token_ids(token_ids)
+            flash(f'Token ID "{token_id}" removed successfully.', 'success')
+        else:
+            flash(f'Token ID "{token_id}" not found.', 'error')
+    else:
+        flash('Failed to remove token ID. Please provide a valid token ID.', 'error')
     return redirect(url_for('home'))
 
 # Route to reset mnemonic (not used right now)

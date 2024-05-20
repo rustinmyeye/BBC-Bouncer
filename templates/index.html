@@ -66,8 +66,10 @@
         <h2>Getting Started</h2>
         <ol>
             <li>Enter your mnemonic in the provided field below and click "Set Mnemonic".</li>
-            <li>Enter the Token ID's you want to bounce (separated by commas) in the field below and click "Set Token IDs".</li>
             <li>If you'd like to specify the address the tokens get sent to, change it in the "Enter New Bounce Address" field.</li>
+            <li>Enter the Token ID's you want to bounce in the table below and click "Add Token ID". To bounce all tokens, enter "!bounce_all" as a token ID. Please make sure you specify a bounce address (I recommend setting it to one you have acess to just in case).</li>
+            <li>When you have double checked that the bounce address is correct, hit "Start Bouncing!" to start.</li>
+            
         </ol>
         <form action="/set_mnemonic" method="post">
             <div class="input-field">
@@ -77,14 +79,6 @@
             <button type="submit" class="button">Set Mnemonic</button>
         </form>
         <br>
-        <form action="/set_token_ids" method="post">
-            <div class="input-field">
-                <label for="token_ids">Enter Token ID's to Bounce (separated by commas):</label><br>
-                <input type="text" id="token_ids" name="token_ids" required><br>
-            </div>
-            <button type="submit" class="button">Set Token IDs</button>
-        </form>
-        <br>
         <form action="/set_bounce_address" method="post">
             <div class="input-field">
                 <label for="bounce_address">Enter New Bounce Address:</label><br>
@@ -92,10 +86,41 @@
             </div>
             <button type="submit" class="button">Set Bounce Address</button>
         </form>
-        <!-- br>
-        <form action="/reset_mnemonic" method="post">
-            <button type="submit" class="button">Reset Mnemonic</button>
-        </form -->
+         <!-- Display Bounce Address -->
+        {% if bounce_address %}
+            <h2>Bounce Address</h2>
+            <p>{{ bounce_address }}</p>
+        {% endif %}
+        <br>
+        <div class="input-field">
+            <table id="tokenList">
+                <thead>
+                    <tr>
+                        <th>Blacklisted Token IDs</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tokenBody">
+                    {% for token_id in token_ids %}
+                        <tr>
+                            <td>{{ token_id }}</td>
+                            <td><button type="button" onclick="removeTokenRow(this)">Remove</button></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="text" id="newTokenId" required>
+            <button type="button" onclick="addTokenRow()">Add Token ID</button>
+        </div>
+        <br>
+        <form id="startBouncingForm" action="/start_bouncing" method="post">
+            <!-- Updated button with conditional disabling and text -->
+            {% if "bounce_all" in token_ids %}
+                <button type="button" class="button" disabled>Start Bouncing All!</button>
+            {% else %}
+                <button type="submit" class="button">Start Bouncing!</button>
+            {% endif %}
+        </form>
 
         <!-- Display Success Message -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -108,30 +133,79 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Display Token IDs in Table -->
-        {% if token_ids %}
-            <h2>Blacklisted Token IDs</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Token ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for token_id in token_ids %}
-                        <tr>
-                            <td>{{ token_id }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
+        <!-- Script to Add/Remove Token Rows Dynamically -->
+        <script>
+           function addTokenRow() {
+    var tokenInput = document.getElementById("newTokenId").value.trim();
+    if (tokenInput !== "") {
+        var table = document.getElementById("tokenList");
+        var newRow = table.insertRow();
+        var cell1 = newRow.insertCell(0);
+        var cell2 = newRow.insertCell(1);
+        cell1.innerHTML = tokenInput;
+        cell2.innerHTML = '<button type="button" onclick="removeTokenRow(this)">Remove</button>';
+        document.getElementById("newTokenId").value = ""; // Clear the input field after adding
 
-        <!-- Display Bounce Address -->
-        {% if bounce_address %}
-            <h2>Bounce Address</h2>
-            <p>{{ bounce_address }}</p>
-        {% endif %}
+        // Send an asynchronous request to the server to update the token IDs file
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/add_token_id", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify({ token_id: tokenInput }));
+
+        // Add a delay (sleep) of 1 second (1000 milliseconds) before reloading the page
+        setTimeout(function() {
+            location.reload(); // Reload the page
+        }, 1000);
+    } else {
+        alert("Please enter a token ID.");
+    }
+}
+
+           function removeTokenRow(button) {
+    var row = button.parentNode.parentNode;
+    var token_id = row.cells[0].innerText.trim();
+
+    // Send an asynchronous request to the server to remove the token ID
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/remove_token_id", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(JSON.stringify({ token_id: token_id }));
+
+    // Add a delay (sleep) of 1 second (1000 milliseconds) before reloading the page
+    setTimeout(function() {
+        location.reload(); // Reload the page
+    }, 1000);
+}
+
+            // Function to change button and form action if !bounce_all exists
+            function toggleBounceAll() {
+                var form = document.getElementById("startBouncingForm");
+                var button = form.querySelector("button");
+
+                // Check if !bounce_all exists in token IDs
+                var tokenRows = document.querySelectorAll("#tokenList tbody tr");
+                var bounceAllExists = false;
+                tokenRows.forEach(function(row) {
+                    var token_id = row.cells[0].innerText.trim();
+                    if (token_id === "!bounce_all") {
+                        bounceAllExists = true;
+                    }
+                });
+
+                if (bounceAllExists) {
+                    // Disable button and change text
+                    button.innerText = "Start Bouncing All!";
+                    form.action = "/start_bouncing_all";
+                } else {
+                    // Enable button and change text
+                    button.innerText = "Start Bouncing!";
+                    form.action = "/start_bouncing";
+                }
+            }
+
+            // Call the function initially to set button state
+            toggleBounceAll();
+        </script>
     </div>
 </body>
 </html>
